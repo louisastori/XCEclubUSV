@@ -1,0 +1,19 @@
+{
+  "name": "xce-web-tests",
+  "private": true,
+  "type": "commonjs",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "cy:open": "cypress open",
+    "cy:run": "cypress run --spec cypress/e2e/xce_flow.cy.js"
+  },
+  "devDependencies": {
+    "cypress": "^13.15.0"
+  },
+  "dependencies": {
+    "better-sqlite3": "^12.6.2",
+    "ejs": "^4.0.1",
+    "express": "^5.2.1"
+  }
+}

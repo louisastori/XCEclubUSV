@@ -1,0 +1,497 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <title>Gestion XCE</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700&display=swap');
+    :root { --bg:#f3f5fb; --card:#ffffff; --primary:#0b7dda; --winner:#0fa36d; --loser:#f59f00; --line:#dfe3ee; --text:#1f2430; }
+    * { box-sizing: border-box; }
+    body { font-family: 'Manrope', 'Segoe UI', sans-serif; max-width: 1100px; margin: 20px auto; background: var(--bg); color: var(--text); padding: 0 14px; }
+    h1, h2 { margin-bottom: 8px; letter-spacing: -0.2px; }
+    section { background: var(--card); padding: 16px; border-radius: 12px; box-shadow: 0 8px 28px rgba(15,23,42,0.06); margin-bottom: 16px; }
+    form { margin-top: 8px; }
+    label { display: block; margin: 6px 0; }
+    input[type=text], input[type=number] { padding: 8px; width: 260px; border: 1px solid #d6d9e0; border-radius: 8px; }
+    button { padding: 9px 14px; border: none; border-radius: 8px; background: var(--primary); color: #fff; cursor: pointer; font-weight: 600; }
+    button:hover { background: #0a6abd; }
+    table { border-collapse: collapse; width: 100%; }
+    th, td { border: 1px solid #e3e7f0; padding: 8px; text-align: left; }
+    .heat { border: 1px solid #e1e5ee; padding: 10px; border-radius: 10px; margin: 8px 0; }
+    .heat legend { font-weight: 700; }
+    .flex { display: flex; gap: 12px; flex-wrap: wrap; }
+    .error { color: #c0392b; font-weight: bold; }
+    .badge { display: inline-block; padding: 2px 6px; border-radius: 6px; font-size: 12px; background: #eef0f6; margin-left: 6px; font-weight: 600; }
+    .badge.win { background: #d1f7ea; color: #0a7253; }
+    .badge.lose { background: #fff0d6; color: #8a5200; }
+    .tab-controls { display:flex; gap:8px; margin:12px 0; }
+    .tab-btn { background: #e8ecf4; color: #2c3445; border-radius: 10px; padding: 9px 14px; border: 1px solid transparent; }
+    .tab-btn.active { background: #0b7dda; color: #fff; box-shadow: 0 8px 20px rgba(11,125,218,0.22); }
+    .tab { display: none; }
+    .tab.active { display: block; }
+    .bracket-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 14px; }
+    .bracket-card { background: linear-gradient(135deg, #ffffff, #f7f9ff); border: 1px solid #e4e8f1; border-radius: 14px; padding: 14px; box-shadow: inset 0 1px 0 rgba(255,255,255,0.6); }
+    .bracket-title { font-weight: 700; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+    .pill { display:inline-block; padding:4px 8px; border-radius: 999px; font-size: 12px; font-weight: 700; color:#fff; }
+    .pill.win { background: var(--winner); }
+    .pill.lose { background: var(--loser); }
+    .rounds { display: flex; gap: 32px; overflow-x: auto; padding: 10px 0; }
+    .round { min-width: 190px; display:flex; flex-direction:column; gap:12px; position:relative; }
+    .round-title { font-weight: 700; color: #4a5160; margin-bottom: 8px; }
+    .match { background: #fff; border: 1px solid #e4e8f1; border-left: 5px solid var(--line); border-radius: 10px; padding: 10px; box-shadow: 0 6px 18px rgba(15,23,42,0.04); position:relative; }
+    .match.win { border-left-color: var(--winner); }
+    .match.lose { border-left-color: var(--loser); }
+    .match-head { font-weight: 600; margin-bottom: 6px; color: #2f3645; }
+    .match-list { list-style: none; margin: 0; padding: 0; }
+    .match-list li { display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px dashed #eef1f6; }
+    .match-list li:last-child { border-bottom: none; }
+    .pos-chip { display:inline-block; min-width: 26px; text-align:center; border-radius: 6px; padding: 2px 6px; font-weight: 700; font-size: 12px; background: #eef0f6; color:#2c3445; }
+    .pos1 { background:#d1f7ea; color:#0a7253; }
+    .pos2 { background:#e8f4ff; color:#0b4f96; }
+    .pos3 { background:#fff4e5; color:#8a5200; }
+    .pos4 { background:#f4e5ff; color:#5a2a82; }
+    .pts-chip { display:inline-block; margin-left:6px; font-size:12px; color:#45506a; font-weight:600; background:#f0f2f8; padding:2px 6px; border-radius:6px; }
+    .muted { color:#697081; font-size: 13px; }
+    .chrono-card { background:#fff; border:1px solid #e4e8f1; border-radius:10px; padding:12px; box-shadow: 0 6px 18px rgba(15,23,42,0.05); margin-top:12px; }
+    .spacer { height:14px; background:#f3f5fb; border-radius:8px; margin:14px 0; }
+    .rounds.tree {
+      position: relative;
+      gap: 44px;
+      padding: 16px 12px 20px;
+      border: 1px solid #e5e9f2;
+      border-radius: 12px;
+      background-color: #f5f7fb;
+      background-image:
+        linear-gradient(to right, rgba(204,212,228,0.35) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(204,212,228,0.26) 1px, transparent 1px);
+      background-size: 24px 24px;
+    }
+    .rounds.tree .round { min-width: 230px; z-index: 1; }
+    .rounds.tree .round-title { font-size: 34px; font-size: clamp(22px, 2.2vw, 34px); letter-spacing: -0.4px; text-align: center; margin-bottom: 10px; color: #4b5468; }
+    .rounds.tree .match { background: #f8fafd; border-color: #d7deec; }
+    .rounds.tree .match-list li { border-bottom-color: #e3e9f3; }
+    .rounds.tree .bracket-lines {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      overflow: visible;
+    }
+    @media (max-width: 900px) {
+      .rounds.tree { gap: 26px; padding: 12px 8px 16px; }
+      .rounds.tree .round { min-width: 205px; }
+    }
+  </style>
+</head>
+<body>
+<h1>Organisation XCE (web + Android)</h1>
+<% if (error) { %>
+  <p class="error">Erreur : <%= error %></p>
+<% } %>
+
+<div class="tab-controls">
+  <button type="button" class="tab-btn active" data-tab="tab-form">Formulaires</button>
+  <button type="button" class="tab-btn" data-tab="tab-bracket">Tableau graphique</button>
+</div>
+
+<div id="tab-form" class="tab active">
+  <section>
+    <h2>Participants</h2>
+    <% if (participants && participants.length) { %>
+      <table>
+        <tr>
+          <th>#</th><th>Nom</th><th>Dossard</th><th>Meilleur chrono</th><th>Rang chrono</th><th>Actions</th>
+        </tr>
+        <% chronoBoard.forEach((row, idx) => { %>
+          <tr>
+            <td><%= idx + 1 %></td>
+            <td><%= row.name %></td>
+            <td><%= row.bib !== null && row.bib !== undefined ? row.bib : '—' %></td>
+            <td><%= row.best_text || '—' %></td>
+            <td><%= row.rank || '—' %></td>
+            <td>
+              <form method="post" action="/participants/<%= row.id %>/delete" style="display:inline;">
+                <button type="submit" style="background:#e74c3c;padding:4px 8px;font-size:12px;">Supprimer</button>
+              </form>
+            </td>
+          </tr>
+        <% }) %>
+      </table>
+      <form method="post" action="/participants/delete-all" style="margin-top:10px;">
+        <button type="submit" style="background:#c0392b;">Supprimer tous</button>
+      </form>
+    <% } else { %>
+      <p>Ajoutez vos premiers participants.</p>
+    <% } %>
+    <div style="margin:10px 0;">
+      <form method="post" action="/participants/seed/<%= 8 %>" style="display:inline;">
+        <button type="submit" class="tab-btn" style="background:#0b7dda;color:#fff;">Liste 8</button>
+      </form>
+      <form method="post" action="/participants/seed/<%= 16 %>" style="display:inline;">
+        <button type="submit" class="tab-btn" style="background:#0b7dda;color:#fff;">Liste 16</button>
+      </form>
+      <form method="post" action="/participants/seed/<%= 32 %>" style="display:inline;">
+        <button type="submit" class="tab-btn" style="background:#0b7dda;color:#fff;">Liste 32</button>
+      </form>
+      <form method="post" action="/participants/seed/<%= 36 %>" style="display:inline;">
+        <button type="submit" class="tab-btn" style="background:#0b7dda;color:#fff;">Liste 36</button>
+      </form>
+      <form method="post" action="/participants/seed/<%= 48 %>" style="display:inline;">
+        <button type="submit" class="tab-btn" style="background:#0b7dda;color:#fff;">Liste 48</button>
+      </form>
+      <form method="post" action="/participants/seed/<%= 52 %>" style="display:inline;">
+        <button type="submit" class="tab-btn" style="background:#0b7dda;color:#fff;">Liste 52</button>
+      </form>
+      <form method="post" action="/participants/seed/<%= 64 %>" style="display:inline;">
+        <button type="submit" class="tab-btn" style="background:#0b7dda;color:#fff;">Liste 64</button>
+      </form>
+    </div>
+    <form method="post" action="/participants">
+      <label>Nom du participant
+        <input type="text" name="name" required>
+      </label>
+      <button type="submit">Ajouter</button>
+    </form>
+  </section>
+
+  <section>
+    <h2>Événement</h2>
+    <% if (activeEvent) { %>
+      <p>Événement actif : <strong><%= activeEvent.name %></strong> (<%= activeEvent.total_rounds %> tours)</p>
+      <p style="margin-top:4px;color:#555;">Catégorie : <strong><%= activeEvent.category || 'Open' %></strong></p>
+      <form method="post" action="/events/<%= activeEvent.id %>/close" style="margin-top:4px;">
+        <button type="submit">Terminer l'événement</button>
+      </form>
+    <% } else { %>
+      <p>Créez un événement pour générer le tour 1 (groupes randomisés).</p>
+      <form method="post" action="/events/start">
+        <label>Nom
+          <input type="text" name="event_name" placeholder="Course XCE locale" required>
+        </label>
+        <label>Catégorie
+          <input type="text" name="event_category" placeholder="Open / U17 / Dames..." />
+        </label>
+        <button type="submit">Démarrer (3 tours)</button>
+      </form>
+    <% } %>
+  </section>
+
+  <% if (activeEvent) { %>
+    <section>
+      <h2>Tour en cours</h2>
+      <% if (currentRound && !chronosDone) { %>
+        <p>Tour n° <%= currentRound %> / <%= activeEvent.total_rounds %></p>
+        <% if (Object.keys(currentRoundParticipants).length) { %>
+          <form method="post" action="/events/<%= activeEvent.id %>/round/<%= currentRound %>/times">
+            <div class="chrono-card">
+              <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;">
+                <h3 style="margin:0;">Chronos (ordre dossard)</h3>
+                <button type="button" id="fill-random" class="tab-btn" style="margin:0;">Pré-remplir aléatoirement</button>
+              </div>
+              <% Object.entries(currentRoundParticipants).forEach(([pid, pname]) => { %>
+                <label>
+                  <%= pname %> – chrono (hh:mm:ss:cc)
+                  <input type="text"
+                         name="times_global[<%= pid %>]"
+                         placeholder="00:01:32:12"
+                         pattern="[0-9]{2}:[0-9]{2}:[0-9]{2}:[0-9]{2}"
+                         inputmode="numeric"
+                         title="hh:mm:ss:cc (centisecondes)">
+                </label>
+              <% }) %>
+            </div>
+            <button type="submit">Enregistrer les chronos</button>
+          </form>
+        <% } else { %>
+          <p class="muted">Aucun participant à chronométrer.</p>
+        <% } %>
+      <% } else if (currentRound && chronosDone) { %>
+        <p>Tour n° <%= currentRound %> / <%= activeEvent.total_rounds %></p>
+        <form method="post" action="/events/<%= activeEvent.id %>/round/<%= currentRound %>/results">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;">
+            <div></div>
+            <button type="button" id="results-random" class="tab-btn" style="margin:0;">Résultats aléatoires</button>
+          </div>
+          <div class="flex">
+            <% heats.forEach((heat) => { %>
+              <fieldset class="heat">
+                <legend>Groupe <%= heat.heat_index %>
+                  <% if (Number(heat.stage_tier || 0) > 0) { %>
+                    <span class="badge">classement</span>
+                  <% } %>
+                  <% if (heat.bracket === 'winners') { %>
+                    <span class="badge win">gagnante</span>
+                  <% } else if (heat.bracket === 'losers') { %>
+                    <span class="badge lose">perdante</span>
+                  <% } else { %>
+                    <span class="badge">initiale</span>
+                  <% } %>
+                </legend>
+                <% heat.participants.forEach((hp) => { %>
+                  <label>
+                    <%= hp.name %> (ordre chrono: <%= hp.chrono_order ?? '—' %>) - position
+                    <input type="number"
+                           name="results[<%= heat.id %>][<%= hp.participant_id %>]"
+                           min="1"
+                           max="<%= heat.participants.length %>"
+                           required>
+                  </label>
+                <% }) %>
+              </fieldset>
+            <% }) %>
+          </div>
+          <button type="submit">Enregistrer les résultats</button>
+        </form>
+      <% } else { %>
+        <p>Tous les tours (<%= activeEvent.total_rounds %>) sont terminés. Vous pouvez clore l'événement ou consulter le classement ci-dessus.</p>
+      <% } %>
+    </section>
+  <% } %>
+
+</div>
+
+<div id="tab-bracket" class="tab">
+  <section>
+    <h2>Tableau graphique</h2>
+    <% if (!activeEvent) { %>
+      <p class="muted">Créez d'abord un événement pour générer le tableau.</p>
+    <% } else { %>
+      <p class="muted">Après la fin des 3 tours de poule, les 2 meilleurs de chaque groupe basculent en tableau gagnant et les autres en tableau perdant. Les tours suivants (demi/finale) se génèrent automatiquement.</p>
+      <%
+        const initialTotals = {};
+        if (brackets.initial) {
+          Object.values(brackets.initial).forEach((heatsByRound) => {
+            heatsByRound.forEach((heat) => {
+              heat.participants.forEach((runner) => {
+                if (runner.id === null || runner.id === undefined) return;
+                const pos = runner.position;
+                const pts = runner.points !== null && runner.points !== undefined
+                  ? Number(runner.points)
+                  : (pos ? ([4,3,2,1][pos - 1] ?? 1) : 0);
+                initialTotals[runner.id] = (initialTotals[runner.id] || 0) + pts;
+              });
+            });
+          });
+        }
+      %>
+      <div class="bracket-grid">
+        <div class="bracket-card">
+          <div class="bracket-title">Tour initial <span class="pill" style="background:#0b7dda;">randomisé</span></div>
+          <% if (brackets.initial && Object.keys(brackets.initial).length) { %>
+            <div class="rounds">
+              <% Object.entries(brackets.initial).forEach(([round, heatsByRound]) => { %>
+                <div class="round">
+                  <div class="round-title">Tour <%= round %></div>
+                  <% heatsByRound.forEach((heat) => { %>
+                    <div class="match">
+                      <div class="match-head">Groupe <%= heat.heat_index %><% if (Number(heat.stage_tier || 0) > 0) { %> - classement<% } %></div>
+                      <ul class="match-list">
+                        <% heat.participants.forEach((runner) => { 
+                            const pos = runner.position;
+                            const posClass = pos ? `pos${pos}` : '';
+                            const label = pos ? `#${pos}` : '?';
+                            const totalPts = runner.id !== null && runner.id !== undefined
+                              ? (initialTotals[runner.id] ?? null)
+                              : null;
+                        %>
+                          <li>
+                            <span><%= runner.name %></span>
+                            <span class="pos-chip <%= posClass %>"><%= label %></span>
+                            <span class="pts-chip"><%= totalPts !== null ? `total ${totalPts} pts` : '—' %></span>
+                          </li>
+                        <% }) %>
+                      </ul>
+                    </div>
+                  <% }) %>
+                </div>
+              <% }) %>
+            </div>
+          <% } else { %>
+            <p class="muted">Les groupes initiaux s'affichent après le démarrage.</p>
+          <% } %>
+        </div>
+
+        <div class="bracket-card">
+          <div class="bracket-title">Tableau gagnant <span class="pill win">gagnants</span></div>
+          <% if (brackets.winners && Object.keys(brackets.winners).length) { %>
+            <div class="rounds tree" data-connector-color="#0fa36d">
+              <% Object.entries(brackets.winners).forEach(([round, heatsByRound]) => { %>
+                <div class="round">
+                  <div class="round-title">Tour <%= round %></div>
+                  <% heatsByRound.forEach((heat) => { %>
+                    <div class="match win">
+                      <div class="match-head">Groupe <%= heat.heat_index %><% if (Number(heat.stage_tier || 0) > 0) { %> - classement<% } %></div>
+                      <ul class="match-list">
+                        <% heat.participants.forEach((runner) => { 
+                            const pos = runner.position;
+                            const posClass = pos ? `pos${pos}` : '';
+                            const label = pos ? `#${pos}` : '?';
+                        %>
+                          <li>
+                            <span><%= runner.name %></span>
+                            <span class="pos-chip <%= posClass %>"><%= label %></span>
+                          </li>
+                        <% }) %>
+                      </ul>
+                    </div>
+                  <% }) %>
+                </div>
+              <% }) %>
+            </div>
+          <% } else { %>
+            <p class="muted">Aucun groupe gagnant pour l'instant.</p>
+          <% } %>
+        </div>
+
+        <div class="bracket-card">
+          <div class="bracket-title">Tableau perdant <span class="pill lose">perdants</span></div>
+          <% if (brackets.losers && Object.keys(brackets.losers).length) { %>
+            <div class="rounds tree" data-connector-color="#f59f00">
+              <% Object.entries(brackets.losers).forEach(([round, heatsByRound]) => { %>
+                <div class="round">
+                  <div class="round-title">Tour <%= round %></div>
+                  <% heatsByRound.forEach((heat) => { %>
+                    <div class="match lose">
+                      <div class="match-head">Groupe <%= heat.heat_index %><% if (Number(heat.stage_tier || 0) > 0) { %> - classement<% } %></div>
+                      <ul class="match-list">
+                        <% heat.participants.forEach((runner) => { 
+                            const pos = runner.position;
+                            const posClass = pos ? `pos${pos}` : '';
+                            const label = pos ? `#${pos}` : '?';
+                        %>
+                          <li>
+                            <span><%= runner.name %></span>
+                            <span class="pos-chip <%= posClass %>"><%= label %></span>
+                          </li>
+                        <% }) %>
+                      </ul>
+                    </div>
+                  <% }) %>
+                </div>
+              <% }) %>
+            </div>
+          <% } else { %>
+            <p class="muted">Pas encore de tableau perdant.</p>
+          <% } %>
+        </div>
+      </div>
+    <% } %>
+  </section>
+</div>
+
+<% if (typeof finalRanking !== 'undefined' && finalRanking && finalRanking.length) { %>
+  <section>
+    <h2>Classement</h2>
+    <p class="muted">Classement final.</p>
+    <table>
+      <tr>
+        <th>Place</th><th>Nom</th><th>Tableau</th><th>Niveau</th>
+      </tr>
+      <% finalRanking.forEach((row) => { %>
+        <tr>
+          <td><strong><%= row.place %></strong></td>
+          <td><%= row.name %></td>
+          <td><%= row.bracket === 'winners' ? 'Gagnant' : 'Perdant' %></td>
+          <td><%= row.stage_tier === 0 ? 'Finale' : `Classement ${row.stage_tier}` %></td>
+        </tr>
+      <% }) %>
+    </table>
+  </section>
+<% } %>
+
+<script>
+  // Gestion des onglets : ne cible que les boutons avec un data-tab
+  const tabButtons = document.querySelectorAll('.tab-btn[data-tab]');
+  const tabs = document.querySelectorAll('.tab');
+  const SVG_NS = 'http://www.w3.org/2000/svg';
+
+  function toContainerRect(container, element) {
+    const c = container.getBoundingClientRect();
+    const e = element.getBoundingClientRect();
+    return {
+      x: e.left - c.left + container.scrollLeft,
+      y: e.top - c.top + container.scrollTop,
+      width: e.width,
+      height: e.height,
+    };
+  }
+
+  function drawConnector(svg, x1, y1, x2, y2, color) {
+    const p = document.createElementNS(SVG_NS, 'path');
+    const elbowX = x1 + Math.max(20, (x2 - x1) * 0.45);
+    p.setAttribute('d', `M ${x1} ${y1} L ${elbowX} ${y1} L ${elbowX} ${y2} L ${x2} ${y2}`);
+    p.setAttribute('fill', 'none');
+    p.setAttribute('stroke', color);
+    p.setAttribute('stroke-width', '2');
+    p.setAttribute('stroke-linecap', 'round');
+    p.setAttribute('stroke-linejoin', 'round');
+    p.setAttribute('opacity', '0.9');
+    svg.appendChild(p);
+  }
+
+  function drawBracketTree(container) {
+    container.querySelectorAll(':scope > svg.bracket-lines').forEach((n) => n.remove());
+    const rounds = Array.from(container.querySelectorAll(':scope > .round'));
+    if (rounds.length < 2) return;
+
+    const width = Math.max(container.scrollWidth, container.clientWidth);
+    const height = Math.max(container.scrollHeight, container.clientHeight);
+    const svg = document.createElementNS(SVG_NS, 'svg');
+    svg.classList.add('bracket-lines');
+    svg.setAttribute('width', String(width));
+    svg.setAttribute('height', String(height));
+    svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
+    const color = container.dataset.connectorColor || '#c9d2e4';
+
+    for (let i = 0; i < rounds.length - 1; i += 1) {
+      const fromMatches = Array.from(rounds[i].querySelectorAll(':scope > .match'));
+      const toMatches = Array.from(rounds[i + 1].querySelectorAll(':scope > .match'));
+      if (!fromMatches.length || !toMatches.length) continue;
+
+      fromMatches.forEach((fromMatch, fromIdx) => {
+        const toIdx = Math.min(
+          toMatches.length - 1,
+          Math.floor((fromIdx * toMatches.length) / fromMatches.length)
+        );
+        const toMatch = toMatches[toIdx];
+        const a = toContainerRect(container, fromMatch);
+        const b = toContainerRect(container, toMatch);
+        drawConnector(svg, a.x + a.width, a.y + a.height / 2, b.x, b.y + b.height / 2, color);
+      });
+    }
+
+    container.prepend(svg);
+  }
+
+  function redrawBracketTrees() {
+    document.querySelectorAll('.rounds.tree').forEach((container) => drawBracketTree(container));
+  }
+
+  let resizeTimer = null;
+  window.addEventListener('resize', () => {
+    if (resizeTimer) clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(redrawBracketTrees, 120);
+  });
+
+  window.addEventListener('load', () => {
+    setTimeout(redrawBracketTrees, 120);
+  });
+
+  tabButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      tabButtons.forEach(b => b.classList.remove('active'));
+      tabs.forEach(t => t.classList.remove('active'));
+      btn.classList.add('active');
+      const target = document.getElementById(btn.dataset.tab);
+      if (target) target.classList.add('active');
+      setTimeout(redrawBracketTrees, 80);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  });
+
+  redrawBracketTrees();
+</script>
+<script src="/js/chrono-random.js"></script>
+<script src="/js/results-random.js"></script>
+</body>
+</html>
