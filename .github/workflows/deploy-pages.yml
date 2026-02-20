@@ -6,7 +6,7 @@ on:
       - main
     paths:
       - ".github/workflows/deploy-pages.yml"
-      - "Web/index.php"
+      - "Web/pages/**"
       - "Web/src/public/js/**"
       - "Web/scripts/build-pages.cjs"
       - "Web/package.json"
