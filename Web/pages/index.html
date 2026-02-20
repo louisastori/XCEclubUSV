@@ -3,82 +3,113 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>XCE Club USV</title>
+  <title>Organisation XCE</title>
   <style>
-    :root {
-      --bg: #0d1526;
-      --card: #111b31;
-      --line: #2a3b63;
-      --text: #e6eeff;
-      --muted: #9eb1d8;
-      --accent: #45c4ff;
-    }
+    @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700&display=swap');
+    :root { --bg:#f3f5fb; --card:#ffffff; --primary:#0b7dda; --winner:#0fa36d; --loser:#f59f00; --line:#dfe3ee; --text:#1f2430; --danger:#c0392b; }
     * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      min-height: 100vh;
-      display: grid;
-      place-items: center;
-      padding: 20px;
-      background:
-        radial-gradient(circle at 15% 15%, rgba(69,196,255,0.15), transparent 35%),
-        radial-gradient(circle at 85% 10%, rgba(255,255,255,0.08), transparent 30%),
-        var(--bg);
-      color: var(--text);
-      font-family: "Segoe UI", system-ui, sans-serif;
+    body { font-family: 'Manrope', 'Segoe UI', sans-serif; max-width: 1100px; margin: 20px auto; background: var(--bg); color: var(--text); padding: 0 14px; }
+    h1, h2 { margin-bottom: 8px; letter-spacing: -0.2px; }
+    section { background: var(--card); padding: 16px; border-radius: 12px; box-shadow: 0 8px 28px rgba(15,23,42,0.06); margin-bottom: 16px; }
+    form { margin-top: 8px; }
+    label { display: block; margin: 6px 0; }
+    input[type=text], input[type=number] { padding: 8px; width: 260px; border: 1px solid #d6d9e0; border-radius: 8px; }
+    button { padding: 9px 14px; border: none; border-radius: 8px; background: var(--primary); color: #fff; cursor: pointer; font-weight: 600; }
+    button:hover { background: #0a6abd; }
+    button.secondary { background:#e8ecf4; color:#2c3445; border: 1px solid #d7deec; }
+    button.secondary:hover { background:#dce3ef; }
+    button.danger { background: var(--danger); }
+    button.danger:hover { background: #a93226; }
+    table { border-collapse: collapse; width: 100%; }
+    th, td { border: 1px solid #e3e7f0; padding: 8px; text-align: left; }
+    .heat { border: 1px solid #e1e5ee; padding: 10px; border-radius: 10px; margin: 8px 0; }
+    .heat legend { font-weight: 700; }
+    .flex { display: flex; gap: 12px; flex-wrap: wrap; }
+    .error { color: #c0392b; font-weight: bold; margin: 0 0 10px; }
+    .info { color:#3c4a63; background:#edf3ff; border:1px solid #d9e4fb; border-radius:8px; padding:8px 10px; margin-bottom:12px; }
+    .badge { display: inline-block; padding: 2px 6px; border-radius: 6px; font-size: 12px; background: #eef0f6; margin-left: 6px; font-weight: 600; }
+    .badge.win { background: #d1f7ea; color: #0a7253; }
+    .badge.lose { background: #fff0d6; color: #8a5200; }
+    .tab-controls { display:flex; gap:8px; margin:12px 0; }
+    .tab-btn { background: #e8ecf4; color: #2c3445; border-radius: 10px; padding: 9px 14px; border: 1px solid transparent; }
+    .tab-btn.active { background: #0b7dda; color: #fff; box-shadow: 0 8px 20px rgba(11,125,218,0.22); }
+    .tab { display: none; }
+    .tab.active { display: block; }
+    .actions { display:flex; gap:8px; flex-wrap:wrap; margin:10px 0; }
+    .bracket-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 14px; }
+    .bracket-card { background: linear-gradient(135deg, #ffffff, #f7f9ff); border: 1px solid #e4e8f1; border-radius: 14px; padding: 14px; box-shadow: inset 0 1px 0 rgba(255,255,255,0.6); }
+    .bracket-title { font-weight: 700; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+    .pill { display:inline-block; padding:4px 8px; border-radius: 999px; font-size: 12px; font-weight: 700; color:#fff; }
+    .pill.win { background: var(--winner); }
+    .pill.lose { background: var(--loser); }
+    .pill.initial { background: #0b7dda; }
+    .rounds { display: flex; gap: 32px; overflow-x: auto; padding: 10px 0; }
+    .round { min-width: 190px; display:flex; flex-direction:column; gap:12px; position:relative; }
+    .round-title { font-weight: 700; color: #4a5160; margin-bottom: 8px; }
+    .match { background: #fff; border: 1px solid #e4e8f1; border-left: 5px solid var(--line); border-radius: 10px; padding: 10px; box-shadow: 0 6px 18px rgba(15,23,42,0.04); position:relative; }
+    .match.win { border-left-color: var(--winner); }
+    .match.lose { border-left-color: var(--loser); }
+    .match-head { font-weight: 600; margin-bottom: 6px; color: #2f3645; }
+    .match-list { list-style: none; margin: 0; padding: 0; }
+    .match-list li { display: flex; justify-content: space-between; align-items:center; gap:6px; padding: 4px 0; border-bottom: 1px dashed #eef1f6; }
+    .match-list li:last-child { border-bottom: none; }
+    .pos-chip { display:inline-block; min-width: 26px; text-align:center; border-radius: 6px; padding: 2px 6px; font-weight: 700; font-size: 12px; background: #eef0f6; color:#2c3445; }
+    .pos1 { background:#d1f7ea; color:#0a7253; }
+    .pos2 { background:#e8f4ff; color:#0b4f96; }
+    .pos3 { background:#fff4e5; color:#8a5200; }
+    .pos4 { background:#f4e5ff; color:#5a2a82; }
+    .pts-chip { display:inline-block; margin-left:6px; font-size:12px; color:#45506a; font-weight:600; background:#f0f2f8; padding:2px 6px; border-radius:6px; white-space:nowrap; }
+    .muted { color:#697081; font-size: 13px; }
+    .chrono-card { background:#fff; border:1px solid #e4e8f1; border-radius:10px; padding:12px; box-shadow: 0 6px 18px rgba(15,23,42,0.05); margin-top:12px; }
+    .rounds.tree {
+      position: relative;
+      gap: 44px;
+      padding: 16px 12px 20px;
+      border: 1px solid #e5e9f2;
+      border-radius: 12px;
+      background-color: #f5f7fb;
+      background-image:
+        linear-gradient(to right, rgba(204,212,228,0.35) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(204,212,228,0.26) 1px, transparent 1px);
+      background-size: 24px 24px;
     }
-    .card {
-      width: min(760px, 100%);
-      background: var(--card);
-      border: 1px solid var(--line);
-      border-radius: 16px;
-      padding: 28px 24px;
-      box-shadow: 0 20px 50px rgba(0,0,0,0.35);
-    }
-    h1 {
-      margin: 0 0 12px;
-      font-size: 28px;
-      letter-spacing: -0.3px;
-    }
-    p {
-      margin: 10px 0;
-      color: var(--muted);
-      line-height: 1.5;
-    }
-    .ok {
-      color: var(--accent);
-      font-weight: 700;
-    }
-    ul {
-      margin: 14px 0 0;
-      padding-left: 18px;
-      color: var(--muted);
-      line-height: 1.5;
-    }
-    code {
-      background: rgba(255,255,255,0.08);
-      padding: 2px 6px;
-      border-radius: 6px;
-      color: #dce9ff;
+    .rounds.tree .round { min-width: 230px; z-index: 1; }
+    .rounds.tree .round-title { font-size: clamp(22px, 2.2vw, 34px); letter-spacing: -0.4px; text-align: center; margin-bottom: 10px; color: #4b5468; }
+    .rounds.tree .match { background: #f8fafd; border-color: #d7deec; }
+    .rounds.tree .match-list li { border-bottom-color: #e3e9f3; }
+    .rounds.tree .bracket-lines { position: absolute; inset: 0; pointer-events: none; z-index: 0; overflow: visible; }
+    @media (max-width: 900px) {
+      .rounds.tree { gap: 26px; padding: 12px 8px 16px; }
+      .rounds.tree .round { min-width: 205px; }
+      input[type=text], input[type=number] { width: 100%; }
     }
   </style>
 </head>
 <body>
-  <main class="card">
-    <h1>XCE Club USV</h1>
-    <p class="ok">Cette version est bien deployee sur GitHub Pages (statique).</p>
-    <p>
-      GitHub Pages ne peut pas executer PHP, Node.js, Express ni SQLite.
-      La redirection vers un relais local a donc ete retiree.
-    </p>
-    <p>
-      Pour la version complete (formulaires + calculs tournoi + base de donnees),
-      il faut heberger le backend Node/Express ailleurs (Render, Railway, VPS, etc.).
-    </p>
-    <ul>
-      <li>Code backend local : <code>Web/src/server.js</code></li>
-      <li>Version publique Pages : statique uniquement</li>
-    </ul>
-  </main>
+  <h1>Organisation XCE (100% front)</h1>
+  <p class="info">Mode statique GitHub Pages: donnees stockees localement dans ton navigateur (localStorage).</p>
+  <div id="error-container"></div>
+
+  <div class="tab-controls">
+    <button type="button" class="tab-btn active" data-tab="tab-form">Formulaires</button>
+    <button type="button" class="tab-btn" data-tab="tab-bracket">Tableau graphique</button>
+  </div>
+
+  <div id="tab-form" class="tab active">
+    <section id="participants-section"></section>
+    <section id="event-section"></section>
+    <section id="round-section"></section>
+  </div>
+
+  <div id="tab-bracket" class="tab">
+    <section id="bracket-section"></section>
+  </div>
+
+  <section id="ranking-section"></section>
+
+  <script defer src="js/ui-tabs-bracket.js"></script>
+  <script defer src="js/xce-state.js"></script>
+  <script defer src="js/xce-view.js"></script>
+  <script defer src="js/xce-app.js"></script>
 </body>
 </html>

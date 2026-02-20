@@ -15,7 +15,9 @@ Ce depot publie automatiquement une version statique du site via GitHub Pages.
 2. Dans `Build and deployment`, choisir `Source: GitHub Actions`.
 3. Pousser sur `main` (ou lancer le workflow `Deploy GitHub Pages` manuellement).
 
-## Limite importante
+## Notes de fonctionnement
 
-GitHub Pages est statique: il ne peut pas executer PHP, Node/Express ni SQLite.
-La version complete de l'application (`node src/server.js`) doit etre hebergee sur une plateforme backend (Render, Railway, VPS, etc.).
+- La version GitHub Pages est maintenant une SPA 100% front avec `localStorage`.
+- Elle ne depend pas de PHP, Node/Express ni SQLite.
+- Les donnees sont locales au navigateur: changer de navigateur/appareil repart de zero.
+- La version backend historique (`node src/server.js`) peut continuer a etre utilisee en local ou sur un hebergement serveur.
