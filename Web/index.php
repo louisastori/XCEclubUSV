@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
   <meta charset="utf-8">
-  <title>Maquette XCE – passer au serveur Node</title>
+  <title>Maquette XCE - passer au serveur Node</title>
   <style>
     :root { --bg:#0b1220; --card:#11192a; --text:#e9efff; --accent:#45c4ff; --muted:#8ca0c2; }
     * { box-sizing: border-box; }
@@ -16,11 +16,12 @@
 </head>
 <body>
   <div class="card">
-    <h1>Application déplacée côté Node/Express</h1>
-    <p>Cette page PHP est désormais un simple relais. Lancez le serveur JS puis accédez à l’URL Express.</p>
-    <p>Commande : <code>npm start</code></p>
-    <p>URL : <a class="btn" href="http://localhost:8000">http://localhost:8000</a></p>
-    <p>Si vous voyez encore cette page, vérifiez que le serveur Node est bien démarré et que vous ouvrez le port 8000.</p>
+    <h1>Application deplacee cote Node/Express</h1>
+    <p>Cette page PHP est un relais. Lancez le serveur JS puis ouvrez l'URL Express.</p>
+    <p>Lanceur Windows (recommande) : <code>..\lancer-xce.bat</code></p>
+    <p>Commande directe : <code>node src/server.js</code></p>
+    <p>URL : <a class="btn" href="http://localhost:8000">http://localhost:8000</a></p>
+    <p>Si la page reste ici, verifiez que le serveur Node tourne bien sur le port 8000.</p>
   </div>
   <script>
     // Redirection automatique vers le serveur JS s'il est joignable

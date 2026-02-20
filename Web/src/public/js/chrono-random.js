@@ -1,4 +1,8 @@
 (() => {
+  if (typeof window === 'undefined' || typeof document === 'undefined') {
+    return;
+  }
+
   const pad = (n, len = 2) => String(n).padStart(len, '0');
 
   function randomMs() {
